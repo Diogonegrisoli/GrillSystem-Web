@@ -6,24 +6,29 @@ export enum TipoCliente {
     JURIDICA = 'juridica',
 }
 
-@Entity('clientes')
+@Entity('cliente')
 export class Cliente extends BaseEntity{
     @PrimaryGeneratedColumn()
     id!: number;
-    @Column()
+
+    @Column({ length: 100 })
     nome!: string;
-    @Column()
+
+    @Column({ name: 'cpf_cnpj', length: 14 })
     cpfCnpj!: string;
+
     @Column({
         type: 'enum',
         enum: TipoCliente,
     })
     tipo!: TipoCliente;
-    @Column()
+
+    @Column({ length: 15 })
     telefone!: string;
-    @Column()
+
+    @Column({ length: 200 })
     endereco!: string;
 
     @OneToMany(() => PedidoVenda, (pedidoVenda) => pedidoVenda.cliente)
-    pedidosVenda!: PedidoVenda[];
+    pedidosVenda?: PedidoVenda[];
 }

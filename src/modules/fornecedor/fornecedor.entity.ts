@@ -7,6 +7,9 @@ export class Fornecedor extends BaseEntity {
     id!: number;
 
     @Column()
+    nomeFantasia!: string;
+
+    @Column()
     razaoSocial!: string;
 
     @Column()

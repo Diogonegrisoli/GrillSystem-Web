@@ -1,8 +1,14 @@
 import { ContaPagar } from "src/modules/conta-pagar/conta-pagar.entity";
 import { Fornecedor } from "src/modules/fornecedor/fornecedor.entity";
 import { Funcionario } from "src/modules/funcionario/funcionario.entity";
-import { Produto } from "src/modules/produto/produto.entity";
-import { BaseEntity, Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+
+export enum StatusCompra {
+    ENTREGUE = 'entregue',
+    EM_ANDAMENTO = 'em_andamento',
+    SOLICITADO = 'solicitado',
+    PENDENTE = 'pendente',
+}
 
 @Entity('pedidos_compra')
 export class PedidoCompra extends BaseEntity {
@@ -15,18 +21,23 @@ export class PedidoCompra extends BaseEntity {
     @Column({ type: 'date', nullable: true })
     dataEntrega!: Date;
 
-    @Column()
-    status!: string;
+    @Column({
+        type: 'enum',
+        enum: StatusCompra,
+    })
+    status!: StatusCompra;
 
     @Column({ type: 'decimal', precision: 10, scale: 2 })
     valorTotal!: number;
 
-    @ManyToOne(() => Funcionario, (funcionario) => funcionario.pedidosCompra)
-    funcionario!: Funcionario;
+    @Column()
+    fornecedorId!: number;
 
-    @ManyToMany(() => Produto, (produto) => produto.pedidosCompra)
-    @JoinTable()
-    produtos!: Produto[];
+    @Column()
+    funcionarioId!: number;
+
+    @ManyToOne(() => Funcionario)
+    funcionario!: Funcionario;
 
     @ManyToOne(() => Fornecedor, (fornecedor) => fornecedor.pedidosCompra)
     fornecedor!: Fornecedor;

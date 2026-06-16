@@ -1,7 +1,10 @@
-import { PedidoCompra } from "src/modules/pedido-compra/pedido-compra.entity";
-import { PedidoVenda } from "src/modules/pedido-venda/pedido-venda.entity";
 import { Usuario } from "src/modules/usuario/usuario.entity";
-import { BaseEntity, Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+
+export enum StatusFuncionario{
+    ATIVO = 'ativo',
+    INATIVO = 'inativo'
+}
 
 @Entity('funcionarios')
 export class Funcionario extends BaseEntity {
@@ -14,16 +17,12 @@ export class Funcionario extends BaseEntity {
     @Column()
     cpf!: string;
 
-    @Column()
-    status!: string;
+    @Column({
+        type: 'enum',
+        enum: StatusFuncionario,
+    })
+    status!: StatusFuncionario;
 
     @OneToOne(() => Usuario, (usuario) => usuario.funcionario)
-    @JoinColumn()
-    usuario!: Usuario;
-
-    @OneToMany(() => PedidoVenda, (pedidoVenda) => pedidoVenda.funcionario)
-    pedidosVenda!: PedidoVenda[];
-
-    @OneToMany(() => PedidoCompra, (pedidoCompra) => pedidoCompra.funcionario)
-    pedidosCompra!: PedidoCompra[];
+    usuario?: Usuario;
 }
