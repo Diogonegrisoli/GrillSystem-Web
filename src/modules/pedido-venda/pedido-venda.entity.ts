@@ -1,6 +1,7 @@
 import { Cliente } from "src/modules/cliente/cliente.entity";
 import { ContaReceber } from "src/modules/conta-receber/conta-receber.entity";
-import { BaseEntity, Column, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Produto } from "src/modules/produto/produto.entity";
+import { BaseEntity, Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 export enum StatusPedido {
     PENDENTE = 'pendente',
@@ -38,4 +39,8 @@ export class PedidoVenda extends BaseEntity {
 
     @ManyToOne(() => Cliente, (cliente) => cliente.pedidosVenda)
     cliente!: Cliente;
+
+    @ManyToMany(() => Produto, (produto) => produto.pedidosVenda)
+    @JoinTable()
+    produtos!: Produto[];
 }

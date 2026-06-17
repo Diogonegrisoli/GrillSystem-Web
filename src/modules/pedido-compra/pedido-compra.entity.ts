@@ -1,13 +1,13 @@
 import { ContaPagar } from "src/modules/conta-pagar/conta-pagar.entity";
 import { Fornecedor } from "src/modules/fornecedor/fornecedor.entity";
 import { Funcionario } from "src/modules/funcionario/funcionario.entity";
-import { BaseEntity, Column, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Produto } from "src/modules/produto/produto.entity";
+import { BaseEntity, Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 export enum StatusCompra {
     ENTREGUE = 'entregue',
     EM_ANDAMENTO = 'em_andamento',
-    SOLICITADO = 'solicitado',
-    PENDENTE = 'pendente',
+    PENDENTE = 'pendente'
 }
 
 @Entity('pedidos_compra')
@@ -19,7 +19,7 @@ export class PedidoCompra extends BaseEntity {
     dataPedido!: Date;
 
     @Column({ type: 'date', nullable: true })
-    dataEntrega!: Date;
+    dataEntrega?: Date;
 
     @Column({
         type: 'enum',
@@ -41,6 +41,10 @@ export class PedidoCompra extends BaseEntity {
 
     @ManyToOne(() => Fornecedor, (fornecedor) => fornecedor.pedidosCompra)
     fornecedor!: Fornecedor;
+
+    @ManyToMany(() => Produto, (produto) => produto.pedidosCompra)
+    @JoinTable()
+    produtos!: Produto[];
 
     @OneToOne(() => ContaPagar, (contaPagar) => contaPagar.pedidoCompra)
     contaPagar!: ContaPagar;
