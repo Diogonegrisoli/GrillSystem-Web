@@ -26,9 +26,11 @@
     "@nestjs/platform-express": "^11.0.1",
     "@types/ejs": "^3.1.5",
     "@types/express-ejs-layouts": "^2.5.4",
+    "bcrypt": "^6.0.0",
     "class-validator": "^0.15.1",
     "ejs": "^6.0.1",
     "express-ejs-layouts": "^2.5.1",
+    "jsonwebtoken": "^9.0.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "typeorm": "^1.0.0"

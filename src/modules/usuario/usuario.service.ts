@@ -14,6 +14,14 @@ export class UsuarioService {
         return Usuario.findOne({ where: { id } });
     }
 
+    async findByEmail(email: string): Promise<Usuario | null> {
+        return Usuario.findOne({ where: { email } });
+    }
+
+    validatePassword(senha: string, senhaHash: string): boolean {
+        return this.hashPassword(senha) === senhaHash;
+    }
+
     async findAll(): Promise<Usuario[]> {
         return Usuario.find();
     }

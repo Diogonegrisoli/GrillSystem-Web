@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthModule } from './modules/auth/auth.module';
 import { ClienteModule } from './modules/cliente/cliente.module';
 import { DatabaseModule } from './database/database.module';
 import { ContaPagarModule } from './modules/conta-pagar/conta-pagar.module';
@@ -14,6 +16,8 @@ import { UsuarioModule } from './modules/usuario/usuario.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    AuthModule,
     ClienteModule,
     ContaPagarModule,
     ContaReceberModule,
