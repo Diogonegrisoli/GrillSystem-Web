@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= titulo %> - GrillSystem</title>
+    <link rel="stylesheet" href="/app.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; min-height: 100vh; font-family: Arial, Helvetica, sans-serif; color: #1f2937; background: #f3f6fb; }
+        .app-shell { min-height: 100vh; display: grid; grid-template-columns: 260px 1fr; }
+        .sidebar { background: #1f3b57; color: #eef6ff; padding: 24px 18px; }
+        .brand { font-size: 22px; font-weight: 700; margin-bottom: 30px; }
+        .nav { display: grid; gap: 8px; }
+        .nav a { color: #dbeafe; text-decoration: none; padding: 12px 14px; border-radius: 6px; display: block; }
+        .nav a:hover, .nav a.active { background: #315b80; }
+        .main { min-width: 0; padding: 28px; }
+        h1 { margin: 0 0 22px; font-size: 26px; color: #172033; }
+        form { background: #ffffff; border: 1px solid #d6dee8; border-radius: 8px; padding: 22px; max-width: 960px; }
+        .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+        .field { display: grid; gap: 7px; color: #526273; font-size: 14px; }
+        input, select { width: 100%; min-height: 40px; border: 1px solid #bfccd9; border-radius: 6px; padding: 9px 10px; font-size: 14px; background: #ffffff; }
+        input:disabled, select:disabled { background: #eef3f8; color: #64748b; cursor: not-allowed; }
+        .full { grid-column: 1 / -1; }
+        .preview-table { grid-column: 1 / -1; overflow-x: auto; border: 1px solid #d6dee8; border-radius: 6px; }
+        .preview-table table { width: 100%; border-collapse: collapse; min-width: 560px; }
+        .preview-table th, .preview-table td { padding: 10px; border-bottom: 1px solid #e3e9f0; text-align: left; }
+        .preview-table th { background: #eef3f8; color: #526273; font-size: 13px; }
+        .preview-empty { color: #64748b; text-align: center !important; }
+        .remove-item { width: 32px; height: 32px; border: 1px solid #e0b4b4; border-radius: 6px; background: #ffffff; color: #9b1c1c; cursor: pointer; }
+        .alert { max-width: 960px; margin-bottom: 16px; padding: 12px 14px; border-radius: 6px; border: 1px solid #f0b9b9; background: #fff1f1; color: #9b1c1c; }
+        .actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+        .button { min-height: 40px; border: 0; border-radius: 6px; padding: 0 14px; background: #1f5f8f; color: #ffffff; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
+        .button.secondary { background: #60758a; }
+        .button.compact { min-height: 40px; white-space: nowrap; }
+        @media (max-width: 760px) { .main { padding: 20px; } .grid { grid-template-columns: 1fr; } .full { grid-column: auto; } .inline-field-action { align-items: stretch; flex-direction: column; } }
+    </style>
+</head>
+<body>
+    <div class="app-shell">
+        <%- include('sidebar', { active: typeof active === 'undefined' ? '' : active }) %>
+        <main class="main">
+            <h1><%= titulo %></h1>
+            <% if (erro) { %><div class="alert" role="alert"><%= erro %></div><% } %>
+            <form method="post" action="<%= acao %>" id="record-form">
+                <div class="grid">
+                    <% fields.forEach((field) => { %>
+                        <label class="field <%= field.full ? 'full' : '' %> <%= field.hidden ? 'hidden' : '' %> <%= field.money ? 'money-prefix' : '' %>" <%= field.id ? `id=${field.id}` : '' %>>
+                            <span><%= field.label %></span>
+                            <div class="<%= field.action ? 'inline-field-action' : '' %>">
+                                <% if (field.type === 'select') { %>
+                                    <select name="<%= field.name %>" <%= field.id ? `id=${field.id}-input` : '' %> <%= field.required ? 'required' : '' %> <%= field.disabled ? 'disabled' : '' %>>
+                                        <% if (field.placeholder) { %><option value=""><%= field.placeholder %></option><% } %>
+                                        <% field.options.forEach((option) => { %>
+                                            <option value="<%= option.value %>" <%= String(values[field.name] ?? '') === String(option.value) ? 'selected' : '' %> <%= option.price !== undefined ? `data-price=${option.price}` : '' %> data-label="<%= option.label %>"><%= option.label %></option>
+                                        <% }) %>
+                                    </select>
+                                <% } else { %>
+                                    <input type="<%= field.type || 'text' %>" name="<%= field.name %>" <%= field.id ? `id=${field.id}-input` : '' %> value="<%= field.type === 'password' ? '' : (values[field.name] ?? '') %>" <%= field.required ? 'required' : '' %> <%= field.minlength ? `minlength=${field.minlength}` : '' %> <%= field.maxlength ? `maxlength=${field.maxlength}` : '' %> <%= field.min !== undefined ? `min=${field.min}` : '' %> <%= field.step ? `step=${field.step}` : '' %> <%= field.disabled ? 'disabled' : '' %> <%= field.readonly ? 'readonly' : '' %>>
+                                <% } %>
+                                <% if (field.action) { %>
+                                    <button class="button secondary compact" type="button" data-field-action="<%= field.action %>"><%= field.actionLabel %></button>
+                                <% } %>
+                            </div>
+                            <% if (field.help) { %><small class="field-help"><%= field.help %></small><% } %>
+                        </label>
+                    <% }) %>
+
+                    <% if (typeof itemBuilder !== 'undefined' && itemBuilder) { %>
+                        <div class="full">
+                            <button class="button secondary" type="button" id="add-item">Inserir na tabela</button>
+                            <input type="hidden" name="itensJson" id="items-json" value="">
+                        </div>
+                        <div class="preview-table">
+                            <table>
+                                <thead><tr><% itemBuilder.columns.forEach((column) => { %><th><%= column %></th><% }) %><th aria-label="Remover"></th></tr></thead>
+                                <tbody id="items-body"></tbody>
+                            </table>
+                        </div>
+                    <% } %>
+                </div>
+                <div class="actions">
+                    <a class="button secondary" href="<%= voltarUrl %>">Cancelar</a>
+                    <button class="button" type="submit">Salvar</button>
+                </div>
+            </form>
+        </main>
+    </div>
+    <script src="/sidebar.js"></script>
+    <script src="/form-masks.js"></script>
+    <script>
+        document.querySelectorAll('[data-field-action="enable-password"]').forEach((button) => {
+            button.addEventListener('click', () => {
+                const password = document.getElementById('password-input');
+                const confirmation = document.getElementById('password-confirmation');
+                password.disabled = false;
+                password.required = true;
+                confirmation.classList.remove('hidden');
+                confirmation.querySelector('input').required = true;
+                password.focus();
+                button.classList.add('hidden');
+            });
+        });
+
+        <% if (typeof itemBuilder !== 'undefined' && itemBuilder) { %>
+            const builder = <%- JSON.stringify(itemBuilder).replace(/</g, '\\u003c') %>;
+            const productSelect = document.querySelector(`[name="${builder.productField}"]`);
+            const quantityInput = document.querySelector(`[name="${builder.quantityField}"]`);
+            const unitValueInput = document.querySelector(`[name="${builder.valueField}"]`);
+            const ownerSelect = document.querySelector(`[name="${builder.ownerField}"]`);
+            const itemsBody = document.getElementById('items-body');
+            const itemsJson = document.getElementById('items-json');
+            let items = Array.isArray(builder.initialItems) ? builder.initialItems : [];
+
+            const selectedLabel = (select) => select?.selectedOptions[0]?.dataset.label || select?.selectedOptions[0]?.textContent || '';
+            const formatMoney = (value) => Number(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[character]);
+
+            const updateUnitValue = () => {
+                const price = productSelect?.selectedOptions[0]?.dataset.price;
+                if (price && builder.useProductPrice) unitValueInput.value = Number(price).toFixed(2);
+            };
+
+            const renderItems = () => {
+                itemsJson.value = JSON.stringify(items);
+                if (!items.length) {
+                    itemsBody.innerHTML = `<tr><td class="preview-empty" colspan="${builder.columns.length + 1}">Nenhum item inserido.</td></tr>`;
+                    return;
+                }
+                itemsBody.innerHTML = items.map((item, index) => {
+                    const cells = builder.kind === 'sale'
+                        ? [index + 1, item.ownerLabel, item.productLabel, item.quantidade, formatMoney(item.total)]
+                        : [index + 1, item.productLabel, item.quantidade, formatMoney(item.total)];
+                    return `<tr>${cells.map((cell) => `<td>${escapeHtml(cell)}</td>`).join('')}<td><button class="remove-item" type="button" data-remove-item="${index}" title="Remover item" aria-label="Remover item">X</button></td></tr>`;
+                }).join('');
+            };
+
+            productSelect?.addEventListener('change', updateUnitValue);
+            updateUnitValue();
+
+            document.getElementById('add-item').addEventListener('click', () => {
+                const produtoId = Number(productSelect.value);
+                const quantidade = Number(quantityInput.value);
+                const valorUnitario = Number(unitValueInput.value);
+                if (!produtoId || !quantidade || quantidade < 1 || !valorUnitario || valorUnitario <= 0 || !ownerSelect?.value) {
+                    alert('Selecione os dados obrigatorios e informe quantidade e valor validos.');
+                    return;
+                }
+                const existing = items.findIndex((item) => Number(item.produtoId) === produtoId);
+                const item = {
+                    produtoId,
+                    productLabel: selectedLabel(productSelect),
+                    ownerLabel: selectedLabel(ownerSelect),
+                    quantidade,
+                    valorUnitario,
+                    total: quantidade * valorUnitario,
+                };
+                if (existing >= 0) items[existing] = item; else items.push(item);
+                renderItems();
+            });
+
+            itemsBody.addEventListener('click', (event) => {
+                const button = event.target.closest('[data-remove-item]');
+                if (!button) return;
+                items.splice(Number(button.dataset.removeItem), 1);
+                renderItems();
+            });
+
+            document.getElementById('record-form').addEventListener('submit', (event) => {
+                if (!items.length) {
+                    event.preventDefault();
+                    alert('Insira ao menos um item na tabela antes de salvar.');
+                }
+            });
+
+            renderItems();
+        <% } %>
+    </script>
+</body>
+</html>

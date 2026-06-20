@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= titulo %> - GrillSystem</title>
+    <link rel="stylesheet" href="/app.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; min-height: 100vh; font-family: Arial, Helvetica, sans-serif; color: #1f2937; background: #f3f6fb; }
+        .app-shell { min-height: 100vh; display: grid; grid-template-columns: 260px 1fr; }
+        .sidebar { background: #1f3b57; color: #eef6ff; padding: 24px 18px; }
+        .brand { font-size: 22px; font-weight: 700; margin-bottom: 30px; }
+        .nav { display: grid; gap: 8px; }
+        .nav a { color: #dbeafe; text-decoration: none; padding: 12px 14px; border-radius: 6px; display: block; }
+        .nav a:hover, .nav a.active { background: #315b80; }
+        .main { min-width: 0; padding: 28px; }
+        h1 { margin: 0 0 22px; font-size: 26px; color: #172033; }
+        .details { background: #ffffff; border: 1px solid #d6dee8; border-radius: 8px; padding: 22px; max-width: 840px; display: grid; gap: 14px; }
+        .row { display: grid; grid-template-columns: 190px 1fr; gap: 14px; border-bottom: 1px solid #e3e9f0; padding-bottom: 12px; }
+        .row:last-child { border-bottom: 0; padding-bottom: 0; }
+        .label { color: #526273; }
+        .value { color: #172033; font-weight: 600; }
+        .actions { display: flex; gap: 10px; margin-top: 20px; }
+        .button { min-height: 40px; border: 0; border-radius: 6px; padding: 0 14px; background: #1f5f8f; color: #ffffff; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+        .button.secondary { background: #60758a; }
+        @media (max-width: 760px) { .app-shell { grid-template-columns: 1fr; } .main { padding: 20px; } .row { grid-template-columns: 1fr; gap: 4px; } }
+    </style>
+</head>
+<body>
+    <div class="app-shell">
+        <%- include('sidebar', { active: typeof active === 'undefined' ? '' : active }) %>
+        <main class="main">
+            <h1><%= titulo %></h1>
+            <section class="details">
+                <% rows.forEach((row) => { %>
+                    <div class="row"><span class="label"><%= row.label %></span><span class="value"><%= row.value ?? '' %></span></div>
+                <% }) %>
+            </section>
+            <div class="actions">
+                <a class="button secondary" href="<%= voltarUrl %>">Voltar</a>
+                <% if (editUrl) { %><a class="button" href="<%= editUrl %>">Editar</a><% } %>
+            </div>
+        </main>
+    </div>
+    <script src="/sidebar.js"></script>
+</body>
+</html>

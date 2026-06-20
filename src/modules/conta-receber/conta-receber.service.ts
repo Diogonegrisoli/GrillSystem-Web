@@ -7,11 +7,24 @@ import { UpdateContaReceberDto } from "./dto/update-conta-receber-dto";
 @Injectable()
 export class ContaReceberService {
     async findOne(id: number): Promise<ContaReceber | null> {
-        return ContaReceber.findOne({ where: { id } });
+        return ContaReceber.findOne({
+            where: { id },
+            relations: {
+                pedidoVenda: {
+                    cliente: true,
+                },
+            },
+        });
     }
 
     async findAll(): Promise<ContaReceber[]> {
-        return ContaReceber.find();
+        return ContaReceber.find({
+            relations: {
+                pedidoVenda: {
+                    cliente: true,
+                },
+            },
+        });
     }
 
     async create(dados: CreateContaReceberDto): Promise<ContaReceber> {

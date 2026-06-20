@@ -1,11 +1,6 @@
 import { IsInt, IsNotEmpty, IsNumber, IsPositive, MaxLength, Min, MinLength } from "class-validator";
 
 export class CreateProdutoDto {
-    @IsNotEmpty({ message: 'O codigo deve ser informado.' })
-    @MinLength(6, { message: 'O codigo deve ter no minimo 6 caracteres.' })
-    @MaxLength(8, { message: 'O codigo deve ter no maximo 8 caracteres.' })
-    codigo!: string;
-
     @IsNotEmpty({ message: 'A descricao deve ser informada.' })
     @MinLength(10, { message: 'A descricao deve ter no minimo 10 caracteres.' })
     @MaxLength(150, { message: 'A descricao deve ter no maximo 150 caracteres.' })

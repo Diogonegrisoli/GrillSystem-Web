@@ -16,25 +16,48 @@ export class AuthGuard implements CanActivate {
             context.getHandler(),
             context.getClass(),
         ]);
+        const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
 
-        if (isPublic) {
+        if (isPublic && this.isAuthenticationRoute(request.url)) {
             return true;
         }
 
-        const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
-        const token = this.extractToken(request);
+        try {
+            const token = this.extractToken(request);
+            request.usuario = this.authService.verifyToken(token);
+            return true;
+        } catch (error) {
+            if (request.headers.accept?.includes('text/html')) {
+                const response = context.switchToHttp().getResponse();
+                response.redirect('/login');
+                return false;
+            }
 
-        request.usuario = this.authService.verifyToken(token);
-        return true;
+            throw error;
+        }
     }
 
     private extractToken(request: AuthenticatedRequest): string {
         const [type, token] = request.headers.authorization?.split(' ') ?? [];
 
-        if (type !== 'Bearer' || !token) {
+        if (type === 'Bearer' && token) {
+            return token;
+        }
+
+        const cookieToken = request.headers.cookie
+            ?.split(';')
+            .map((cookie) => cookie.trim().split('='))
+            .find(([name]) => name === 'grill_access_token')?.[1];
+
+        if (!cookieToken) {
             throw new UnauthorizedException('Token de autenticacao nao informado.');
         }
 
-        return token;
+        return decodeURIComponent(cookieToken);
+    }
+
+    private isAuthenticationRoute(url: string): boolean {
+        const path = url.split('?')[0];
+        return path === '/login' || path === '/auth/login';
     }
 }

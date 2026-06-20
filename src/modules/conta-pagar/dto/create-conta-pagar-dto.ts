@@ -17,6 +17,7 @@ export class CreateContaPagarDto {
     @IsDateString({}, { message: 'A data de pagamento deve ser uma data valida.' })
     dataPagamento?: string;
 
+    @IsOptional()
     @IsNumber({}, { message: 'O pedido de compra deve ser numerico.' })
-    pedidoCompraId!: number;
+    pedidoCompraId?: number;
 }

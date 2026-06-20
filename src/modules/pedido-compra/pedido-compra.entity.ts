@@ -10,6 +10,13 @@ export enum StatusCompra {
     PENDENTE = 'pendente'
 }
 
+export interface ItemPedidoCompra {
+    produtoId: number;
+    quantidade: number;
+    valorUnitario: number;
+    total: number;
+}
+
 @Entity('pedidos_compra')
 export class PedidoCompra extends BaseEntity {
     @PrimaryGeneratedColumn()
@@ -29,6 +36,9 @@ export class PedidoCompra extends BaseEntity {
 
     @Column({ type: 'decimal', precision: 10, scale: 2 })
     valorTotal!: number;
+
+    @Column({ type: 'json', nullable: true })
+    itens?: ItemPedidoCompra[];
 
     @Column()
     fornecedorId!: number;

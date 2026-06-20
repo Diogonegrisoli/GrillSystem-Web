@@ -6,7 +6,10 @@ export interface JwtPayload {
 
 export interface AuthenticatedRequest {
     usuario?: JwtPayload;
+    url: string;
     headers: {
         authorization?: string;
+        cookie?: string;
+        accept?: string;
     };
 }

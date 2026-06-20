@@ -36,16 +36,8 @@ export class FornecedorService {
             throw new NotFoundException('Fornecedor nao encontrado.');
         }
 
-        const cnpj = dados.cnpj ? onlyNumbers(dados.cnpj) : undefined;
-
-        if (cnpj && !validateCnpj(cnpj)) {
-            throw new BadRequestException('CNPJ invalido.');
-        }
-
-        Object.assign(fornecedor, {
-            ...dados,
-            ...(cnpj ? { cnpj } : {}),
-        });
+        const { cnpj, ...editableData } = dados;
+        Object.assign(fornecedor, editableData);
 
         return fornecedor.save();
     }

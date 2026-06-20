@@ -15,8 +15,7 @@ export class CreateClienteDto {
     tipo!: TipoCliente;
 
     @IsNotEmpty({ message: 'O telefone deve ser informado.' })
-    @MinLength(15, { message: 'Telefone invalido.' })
-    @MaxLength(15, { message: 'Telefone invalido.' })
+    @MaxLength(15, { message: 'O telefone deve ter no maximo 15 caracteres.' })
     telefone!: string;
 
     @IsNotEmpty({ message: 'O endereco deve ser informado.' })

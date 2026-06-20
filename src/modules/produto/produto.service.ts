@@ -18,7 +18,10 @@ export class ProdutoService {
         ensurePositive(dados.preco, 'preco');
         ensureNotNegative(dados.quantidade, 'quantidade');
 
-        const produto = Produto.create({ ...dados });
+        const produto = Produto.create({
+            ...dados,
+            codigo: await this.generateCode(),
+        });
 
         return produto.save();
     }
@@ -38,7 +41,8 @@ export class ProdutoService {
             ensureNotNegative(dados.quantidade, 'quantidade');
         }
 
-        Object.assign(produto, dados);
+        const { codigo, ...editableData } = dados;
+        Object.assign(produto, editableData);
 
         return produto.save();
     }
@@ -51,6 +55,14 @@ export class ProdutoService {
         }
 
         await produto.remove();
+    }
+
+    private async generateCode(): Promise<string> {
+        const lastProduct = await Produto.createQueryBuilder('produto')
+            .orderBy('produto.id', 'DESC')
+            .getOne();
+        const nextNumber = (lastProduct?.id ?? 0) + 1;
+        return `PRD${String(nextNumber).padStart(5, '0')}`;
     }
 
 }

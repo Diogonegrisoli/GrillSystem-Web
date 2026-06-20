@@ -16,8 +16,7 @@ export class UpdateClienteDto {
     tipo?: TipoCliente;
 
     @IsOptional()
-    @MinLength(15, { message: 'Telefone invalido.' })
-    @MaxLength(15, { message: 'Telefone invalido.' })
+    @MaxLength(15, { message: 'O telefone deve ter no maximo 15 caracteres.' })
     telefone?: string;
 
     @IsOptional()

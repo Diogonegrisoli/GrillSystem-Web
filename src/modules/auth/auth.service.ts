@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { sign, verify } from "jsonwebtoken";
+import { createHmac, timingSafeEqual } from "crypto";
 import { UsuarioService } from "../usuario/usuario.service";
 import { LoginDto } from "./dto/login-dto";
 import { JwtPayload } from "./auth.types";
@@ -26,19 +26,90 @@ export class AuthService {
         };
 
         return {
-            accessToken: sign(payload, this.getJwtSecret(), {
-                expiresIn: this.configService.get<string>('JWT_EXPIRES_IN', '1d'),
-            }),
+            accessToken: this.signToken(payload),
             usuario: payload,
         };
     }
 
     verifyToken(token: string): JwtPayload {
         try {
-            return verify(token, this.getJwtSecret()) as JwtPayload;
+            const [encodedHeader, encodedPayload, signature] = token.split('.');
+
+            if (!encodedHeader || !encodedPayload || !signature) {
+                throw new Error('Invalid token');
+            }
+
+            const expectedSignature = this.createSignature(`${encodedHeader}.${encodedPayload}`);
+
+            if (!this.safeCompare(signature, expectedSignature)) {
+                throw new Error('Invalid signature');
+            }
+
+            const payload = JSON.parse(Buffer.from(encodedPayload, 'base64url').toString('utf8')) as JwtPayload & { exp?: number };
+
+            if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
+                throw new Error('Expired token');
+            }
+
+            return {
+                sub: payload.sub,
+                email: payload.email,
+                funcionarioId: payload.funcionarioId,
+            };
         } catch {
             throw new UnauthorizedException('Token invalido ou expirado.');
         }
+    }
+
+    private signToken(payload: JwtPayload): string {
+        const header = {
+            alg: 'HS256',
+            typ: 'JWT',
+        };
+        const body = {
+            ...payload,
+            exp: Math.floor(Date.now() / 1000) + this.getExpiresInSeconds(),
+        };
+        const encodedHeader = this.base64Url(header);
+        const encodedPayload = this.base64Url(body);
+        const signature = this.createSignature(`${encodedHeader}.${encodedPayload}`);
+
+        return `${encodedHeader}.${encodedPayload}.${signature}`;
+    }
+
+    private base64Url(value: object): string {
+        return Buffer.from(JSON.stringify(value)).toString('base64url');
+    }
+
+    private createSignature(data: string): string {
+        return createHmac('sha256', this.getJwtSecret()).update(data).digest('base64url');
+    }
+
+    private safeCompare(value: string, expected: string): boolean {
+        const valueBuffer = Buffer.from(value);
+        const expectedBuffer = Buffer.from(expected);
+
+        return valueBuffer.length === expectedBuffer.length && timingSafeEqual(valueBuffer, expectedBuffer);
+    }
+
+    private getExpiresInSeconds(): number {
+        const value = this.configService.get<string>('JWT_EXPIRES_IN', '1d');
+        const match = value.match(/^(\d+)([smhd])$/);
+
+        if (!match) {
+            return 86400;
+        }
+
+        const amount = Number(match[1]);
+        const unit = match[2];
+        const multipliers: Record<string, number> = {
+            s: 1,
+            m: 60,
+            h: 3600,
+            d: 86400,
+        };
+
+        return amount * multipliers[unit];
     }
 
     private getJwtSecret(): string {

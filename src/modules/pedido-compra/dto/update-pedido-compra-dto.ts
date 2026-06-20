@@ -1,5 +1,6 @@
 import { ArrayNotEmpty, IsArray, IsDateString, IsEnum, IsInt, IsNumber, IsOptional } from "class-validator";
 import { StatusCompra } from "../pedido-compra.entity";
+import { TipoPagamento } from "src/modules/conta-pagar/conta-pagar.entity";
 
 export class UpdatePedidoCompraDto {
     @IsOptional()
@@ -23,4 +24,12 @@ export class UpdatePedidoCompraDto {
     @ArrayNotEmpty({ message: 'Informe ao menos um produto.' })
     @IsInt({ each: true, message: 'Cada produto deve ser identificado por um numero inteiro.' })
     produtoIds?: number[];
+
+    @IsOptional()
+    @IsArray({ message: 'Os itens devem ser informados em uma lista.' })
+    itens?: Array<{ produtoId: number; quantidade: number; valorUnitario: number; total: number }>;
+
+    @IsOptional()
+    @IsEnum(TipoPagamento, { message: 'Tipo de pagamento invalido.' })
+    tipoPagamento?: TipoPagamento;
 }

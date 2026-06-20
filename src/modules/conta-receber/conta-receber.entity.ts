@@ -45,7 +45,7 @@ export class ContaReceber extends BaseEntity {
     })
     statusPagamento!: StatusPagamento;
 
-    @Column()
+    @Column({ unique: true })
     pedidoVendaId!: number;
 
     @OneToOne(() => PedidoVenda, (pedidoVenda) => pedidoVenda.contaReceber)

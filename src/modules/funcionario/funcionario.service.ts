@@ -37,16 +37,8 @@ export class FuncionarioService {
             throw new NotFoundException('Funcionario nao encontrado.');
         }
 
-        const cpf = dados.cpf ? onlyNumbers(dados.cpf) : undefined;
-
-        if (cpf && !validateCpf(cpf)) {
-            throw new BadRequestException('CPF invalido.');
-        }
-
-        Object.assign(funcionario, {
-            ...dados,
-            ...(cpf ? { cpf } : {}),
-        });
+        const { cpf, ...editableData } = dados;
+        Object.assign(funcionario, editableData);
 
         return funcionario.save();
     }

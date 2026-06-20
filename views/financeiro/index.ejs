@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Financeiro - GrillSystem</title>
+    <link rel="stylesheet" href="/app.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; min-height: 100vh; font-family: Arial, Helvetica, sans-serif; color: #1f2937; background: #f3f6fb; }
+        .app-shell { min-height: 100vh; display: grid; grid-template-columns: 260px 1fr; }
+        .sidebar { background: #1f3b57; color: #eef6ff; padding: 24px 18px; }
+        .brand { font-size: 22px; font-weight: 700; margin-bottom: 30px; }
+        .nav { display: grid; gap: 8px; }
+        .nav a { color: #dbeafe; text-decoration: none; padding: 12px 14px; border-radius: 6px; display: block; }
+        .nav a:hover, .nav a.active { background: #315b80; }
+        .main { min-width: 0; padding: 28px; }
+        h1 { margin: 0 0 24px; font-size: 26px; color: #172033; }
+        .finance-grid { display: grid; grid-template-columns: repeat(2, minmax(240px, 330px)); gap: 18px; }
+        .finance-action { min-height: 190px; display: grid; grid-template-columns: 76px 1fr; align-items: center; gap: 20px; padding: 26px; border: 1px solid #c7d2df; border-radius: 8px; background: #ffffff; color: #172033; text-decoration: none; box-shadow: 0 8px 22px rgba(31, 59, 87, .07); transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease; }
+        .finance-action:hover { border-color: #1f5f8f; box-shadow: 0 12px 28px rgba(31, 59, 87, .13); transform: translateY(-2px); }
+        .finance-action:focus-visible { outline: 3px solid #93c5fd; outline-offset: 3px; }
+        .finance-icon { width: 76px; height: 76px; display: grid; place-items: center; border-radius: 8px; background: #e4edf6; }
+        .finance-icon img { width: 54px; height: 54px; object-fit: contain; }
+        .finance-action strong { display: block; color: #1f3b57; font-size: 21px; }
+        @media (max-width: 760px) { .main { padding: 20px; } .finance-grid { grid-template-columns: 1fr; } .finance-action { min-height: 156px; grid-template-columns: 64px 1fr; padding: 20px; } .finance-icon { width: 64px; height: 64px; } .finance-icon img { width: 46px; height: 46px; } }
+    </style>
+</head>
+<body>
+    <div class="app-shell">
+        <%- include('../shared/sidebar', { active: 'financeiro' }) %>
+        <main class="main">
+            <h1>Financeiro</h1>
+            <section class="finance-grid" aria-label="Acessos financeiros">
+                <a class="finance-action" href="/contas-pagar/consultar">
+                    <span class="finance-icon"><img src="/icons/Icon-compra.png" alt=""></span>
+                    <strong>Contas a Pagar</strong>
+                </a>
+                <a class="finance-action" href="/contas-receber/consultar">
+                    <span class="finance-icon"><img src="/icons/Icon-venda.png" alt=""></span>
+                    <strong>Contas a Receber</strong>
+                </a>
+            </section>
+        </main>
+    </div>
+    <script src="/sidebar.js"></script>
+</body>
+</html>

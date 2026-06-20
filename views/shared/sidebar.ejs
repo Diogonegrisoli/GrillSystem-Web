@@ -1,0 +1,23 @@
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <div class="brand">GrillSystem</div>
+        <button class="sidebar-toggle" type="button" data-sidebar-toggle aria-label="Recolher menu" aria-expanded="true" title="Recolher menu">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m15 18-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+    </div>
+    <nav class="nav" aria-label="Menu principal">
+        <% const current = typeof active === 'undefined' ? '' : active; %>
+        <a class="<%= current === 'inicio' ? 'active' : '' %>" href="/" title="Inicio"><span class="nav-icon"><img src="/icons/Icon-menu.png" alt=""></span><span class="nav-label">Inicio</span></a>
+        <a class="<%= current === 'clientes' ? 'active' : '' %>" href="/clientes/consultar" title="Clientes"><span class="nav-icon"><img src="/icons/Icon-cliente.png" alt=""></span><span class="nav-label">Clientes</span></a>
+        <a class="<%= current === 'produtos' ? 'active' : '' %>" href="/produtos/consultar" title="Produtos"><span class="nav-icon"><img src="/icons/Icon-produto.png" alt=""></span><span class="nav-label">Produtos</span></a>
+        <a class="<%= current === 'fornecedores' ? 'active' : '' %>" href="/fornecedores/consultar" title="Fornecedores"><span class="nav-icon"><img src="/icons/Icon-fornecedor.png" alt=""></span><span class="nav-label">Fornecedores</span></a>
+        <a class="<%= current === 'funcionarios' ? 'active' : '' %>" href="/funcionarios/consultar" title="Funcionarios"><span class="nav-icon"><img src="/icons/Icon-funcionario.png" alt=""></span><span class="nav-label">Funcionarios</span></a>
+        <a class="<%= current === 'usuarios' ? 'active' : '' %>" href="/usuarios/consultar" title="Usuarios"><span class="nav-icon"><img src="/icons/Icon-usuario.png" alt=""></span><span class="nav-label">Usuarios</span></a>
+        <a class="<%= current === 'vendas' ? 'active' : '' %>" href="/pedidos-venda/consultar" title="Vendas"><span class="nav-icon"><img src="/icons/Icon-venda.png" alt=""></span><span class="nav-label">Vendas</span></a>
+        <a class="<%= current === 'compras' ? 'active' : '' %>" href="/pedidos-compra/consultar" title="Compras"><span class="nav-icon"><img src="/icons/Icon-compra.png" alt=""></span><span class="nav-label">Compras</span></a>
+        <a class="<%= current === 'financeiro' ? 'active' : '' %>" href="/financeiro" title="Financeiro"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M16 12h5M7 9h5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="12" r="1" fill="currentColor"/></svg></span><span class="nav-label">Financeiro</span></a>
+    </nav>
+    <form class="logout-form" method="post" action="/logout">
+        <button type="submit" title="Sair"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M10 17l5-5-5-5M15 12H3M14 4h5a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="nav-label">Sair</span></button>
+    </form>
+</aside>

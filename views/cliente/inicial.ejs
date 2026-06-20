@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GrillSystem</title>
+    <link rel="stylesheet" href="/app.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; min-height: 100vh; font-family: Arial, Helvetica, sans-serif; color: #1f2937; background: #f3f6fb; }
+        .app-shell { min-height: 100vh; display: grid; grid-template-columns: 260px 1fr; }
+        .sidebar { background: #1f3b57; color: #eef6ff; padding: 24px 18px; }
+        .brand { font-size: 22px; font-weight: 700; margin-bottom: 30px; }
+        .nav { display: grid; gap: 8px; }
+        .nav a { color: #dbeafe; text-decoration: none; padding: 12px 14px; border-radius: 6px; display: block; }
+        .nav a:hover, .nav a.active { background: #315b80; }
+        .main { min-width: 0; padding: 28px; }
+        .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 28px; }
+        h1 { margin: 0; font-size: 28px; color: #172033; }
+        .user-icon { width: 42px; height: 42px; border-radius: 50%; background: #d7e3f1; border: 1px solid #b8c7d8; display: grid; place-items: center; color: #1f3b57; }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+        .summary { background: #ffffff; border: 1px solid #d6dee8; border-radius: 8px; padding: 18px; text-decoration: none; }
+        .summary span { color: #64748b; font-size: 13px; text-transform: uppercase; }
+        .summary strong { display: block; margin-top: 8px; font-size: 24px; color: #1f3b57; }
+        @media (max-width: 760px) { .main { padding: 20px; } .topbar { align-items: flex-start; } }
+    </style>
+</head>
+<body>
+    <div class="app-shell">
+        <%- include('../shared/sidebar', { active: 'inicio' }) %>
+        <main class="main">
+            <header class="topbar">
+                <h1>Seja bem-vindo ao GrillSystem, <%= nome %></h1>
+                <div class="user-icon" aria-label="Usuario">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 21a8 8 0 0 0-16 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/></svg>
+                </div>
+            </header>
+            <section class="dashboard-grid" aria-label="Atalhos">
+                <a class="summary" href="/clientes/consultar"><span>Cadastro</span><strong>Clientes</strong></a>
+                <a class="summary" href="/pedidos-venda/consultar"><span>Operacao</span><strong>Vendas</strong></a>
+                <a class="summary" href="/produtos/consultar"><span>Controle</span><strong>Produtos</strong></a>
+                <a class="summary" href="/financeiro"><span>Gestao</span><strong>Financeiro</strong></a>
+            </section>
+        </main>
+    </div>
+    <script src="/sidebar.js"></script>
+</body>
+</html>

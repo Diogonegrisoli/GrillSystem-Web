@@ -1,7 +1,7 @@
 import {ConfigService} from '@nestjs/config';
 import { DataSource } from 'typeorm';
 import { DATABASE_SOURCE } from 'src/constants/database-source';
-import { config } from 'process';
+import { join } from 'path';
 
 const toBoolean = (value: string | undefined, fallback: boolean): boolean => {
     if (value  === undefined) return fallback;
@@ -20,7 +20,7 @@ export const databaseProviders = [
                 username: configService.get<string>('DB_USERNAME'),
                 password: configService.get<string>('DB_PASSWORD'),
                 database: configService.get<string>('DB_NAME'),
-                entities: [__dirname + '/../../**/*.entity{.ts,.js}'],
+                entities: [join(__dirname, '..', '**', '*.entity.js')],
                 synchronize: toBoolean(
                     configService.get<string>('DB_SYNCHRONIZE', 'false'),
                     false,

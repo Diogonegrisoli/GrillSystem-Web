@@ -11,7 +11,7 @@ export class UsuarioService {
     }
 
     async findOne(id: number): Promise<Usuario | null> {
-        return Usuario.findOne({ where: { id } });
+        return Usuario.findOne({ where: { id }, relations: { funcionario: true } });
     }
 
     async findByEmail(email: string): Promise<Usuario | null> {
@@ -23,7 +23,7 @@ export class UsuarioService {
     }
 
     async findAll(): Promise<Usuario[]> {
-        return Usuario.find();
+        return Usuario.find({ relations: { funcionario: true } });
     }
 
     async create(dados: CreateUsuarioDto): Promise<Usuario> {
@@ -43,12 +43,11 @@ export class UsuarioService {
             throw new NotFoundException('Usuario nao encontrado.');
         }
 
+        const { senha, funcionarioId, ...editableData } = dados;
         Object.assign(usuario, {
-            ...dados,
-            ...(dados.senha ? { senhaHash: this.hashPassword(dados.senha) } : {}),
+            ...editableData,
+            ...(senha ? { senhaHash: this.hashPassword(senha) } : {}),
         });
-
-        delete (usuario as unknown as { senha?: string }).senha;
 
         return usuario.save();
     }

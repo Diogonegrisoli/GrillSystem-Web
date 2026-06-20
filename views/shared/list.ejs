@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= titulo %> - GrillSystem</title>
+    <link rel="stylesheet" href="/app.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; min-height: 100vh; font-family: Arial, Helvetica, sans-serif; color: #1f2937; background: #f3f6fb; }
+        .app-shell { min-height: 100vh; display: grid; grid-template-columns: 260px 1fr; }
+        .sidebar { background: #1f3b57; color: #eef6ff; padding: 24px 18px; }
+        .brand { font-size: 22px; font-weight: 700; margin-bottom: 30px; }
+        .nav { display: grid; gap: 8px; }
+        .nav a { color: #dbeafe; text-decoration: none; padding: 12px 14px; border-radius: 6px; display: block; }
+        .nav a:hover, .nav a.active { background: #315b80; }
+        .main { min-width: 0; padding: 28px; }
+        .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+        h1 { margin: 0; font-size: 26px; color: #172033; }
+        .user-icon { width: 42px; height: 42px; border-radius: 50%; background: #d7e3f1; border: 1px solid #b8c7d8; display: grid; place-items: center; color: #1f3b57; }
+        .toolbar { display: flex; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+        .search-form { display: flex; gap: 10px; width: min(620px, 100%); }
+        input, select { width: 100%; min-height: 40px; border: 1px solid #bfccd9; border-radius: 6px; padding: 9px 10px; font-size: 14px; background: #ffffff; }
+        .button { min-height: 40px; border: 0; border-radius: 6px; padding: 0 14px; background: #1f5f8f; color: #ffffff; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; white-space: nowrap; font-size: 14px; }
+        .button.secondary { background: #60758a; }
+        .button.success { background: #23745d; }
+        .finance-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+        .table-wrap { overflow-x: auto; background: #ffffff; border: 1px solid #d6dee8; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; min-width: 760px; }
+        th, td { padding: 13px 14px; border-bottom: 1px solid #e3e9f0; text-align: left; vertical-align: middle; }
+        th { font-size: 13px; color: #526273; background: #eef3f8; }
+        tr:last-child td { border-bottom: 0; }
+        .actions { display: flex; justify-content: flex-end; gap: 8px; }
+        .icon-button { width: 34px; height: 34px; border-radius: 6px; border: 1px solid #c7d2df; color: #1f3b57; background: #ffffff; display: inline-grid; place-items: center; cursor: pointer; }
+        .icon-button.danger { color: #9b1c1c; }
+        .icon-button.success { color: #23745d; }
+        .empty-state { padding: 22px; color: #64748b; }
+        .modal-backdrop { position: fixed; inset: 0; display: none; place-items: center; padding: 20px; background: rgba(15, 23, 42, .48); }
+        .modal-backdrop.open { display: grid; }
+        .modal { width: min(440px, 100%); background: #ffffff; border-radius: 8px; border: 1px solid #d6dee8; padding: 22px; }
+        .modal h2 { margin: 0 0 8px; font-size: 20px; }
+        .modal p { margin: 0 0 18px; color: #526273; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+        @media (max-width: 840px) { .app-shell { grid-template-columns: 1fr; } .toolbar, .search-form { align-items: stretch; flex-direction: column; } .main { padding: 20px; } }
+    </style>
+</head>
+<body>
+    <div class="app-shell">
+        <%- include('sidebar', { active }) %>
+        <main class="main">
+            <header class="topbar">
+                <h1><%= titulo %></h1>
+                <div class="user-icon" aria-label="Usuario">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 21a8 8 0 0 0-16 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/></svg>
+                </div>
+            </header>
+
+            <% if (financeiroLinks && financeiroLinks.length) { %>
+                <div class="finance-actions">
+                    <% financeiroLinks.forEach((link) => { %>
+                        <a class="button" href="<%= link.href %>"><%= link.label %></a>
+                    <% }) %>
+                </div>
+            <% } %>
+
+            <div class="toolbar">
+                <form class="search-form" method="get" action="<%= consultaUrl %>">
+                    <input name="busca" value="<%= busca %>" placeholder="<%= buscaPlaceholder %>">
+                    <button class="button" type="submit">Buscar</button>
+                </form>
+                <% if (createUrl) { %>
+                    <a class="button" href="<%= createUrl %>"><%= createLabel %></a>
+                <% } %>
+            </div>
+
+            <div class="table-wrap">
+                <% if (items.length === 0) { %>
+                    <div class="empty-state">Nenhum registro encontrado.</div>
+                <% } else { %>
+                    <table>
+                        <thead>
+                            <tr>
+                                <% columns.forEach((column) => { %>
+                                    <th><%= column.label %></th>
+                                <% }) %>
+                                <th style="text-align: right;">Acoes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% items.forEach((item) => { %>
+                                <tr>
+                                    <% columns.forEach((column) => { %>
+                                        <td><%= item[column.key] ?? '' %></td>
+                                    <% }) %>
+                                    <td>
+                                        <div class="actions">
+                                            <% if (item.editUrl) { %>
+                                                <a class="icon-button" href="<%= item.editUrl %>" title="Editar" aria-label="Editar">
+                                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+                                                </a>
+                                            <% } %>
+                                            <% if (item.viewUrl) { %>
+                                                <a class="icon-button" href="<%= item.viewUrl %>" title="Visualizar" aria-label="Visualizar">
+                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>
+                                                </a>
+                                            <% } %>
+                                            <% if (item.receiveUrl) { %>
+                                                <button class="icon-button success" type="button" title="Receber conta" aria-label="Receber conta" data-receive-url="<%= item.receiveUrl %>" data-receive-name="<%= item.deleteName %>">
+                                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2v20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M17 6.5H9.5a3.5 3.5 0 0 0 0 7H14a3.5 3.5 0 0 1 0 7H6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                                                </button>
+                                            <% } %>
+                                            <% if (item.deleteUrl) { %>
+                                                <button class="icon-button danger" type="button" title="Excluir" aria-label="Excluir" data-delete-url="<%= item.deleteUrl %>" data-delete-name="<%= item.deleteName %>">
+                                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M8 6V4h8v2" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M6 6l1 15h10l1-15" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+                                                </button>
+                                            <% } %>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                <% } %>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-backdrop" id="delete-modal">
+        <div class="modal" role="dialog" aria-modal="true">
+            <h2>Confirmar exclusao</h2>
+            <p id="delete-message">Tem certeza que deseja deletar este cadastro?</p>
+            <form id="delete-form" method="post">
+                <div class="modal-actions">
+                    <button class="button secondary" type="button" data-close-modal>Cancelar</button>
+                    <button class="button" type="submit">Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="receive-modal">
+        <div class="modal" role="dialog" aria-modal="true">
+            <h2>Receber conta</h2>
+            <p id="receive-message">Deseja confirmar o recebimento desta conta?</p>
+            <form id="receive-form" method="post">
+                <div class="modal-actions">
+                    <button class="button secondary" type="button" data-close-modal>Voltar</button>
+                    <button class="button success" type="submit">Receber</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/sidebar.js"></script>
+    <script>
+        const deleteModal = document.getElementById('delete-modal');
+        const deleteForm = document.getElementById('delete-form');
+        const deleteMessage = document.getElementById('delete-message');
+        const receiveModal = document.getElementById('receive-modal');
+        const receiveForm = document.getElementById('receive-form');
+        const receiveMessage = document.getElementById('receive-message');
+
+        document.querySelectorAll('[data-delete-url]').forEach((button) => {
+            button.addEventListener('click', () => {
+                deleteForm.action = button.dataset.deleteUrl;
+                deleteMessage.textContent = `Tem certeza que deseja deletar ${button.dataset.deleteName}?`;
+                deleteModal.classList.add('open');
+            });
+        });
+
+        document.querySelectorAll('[data-receive-url]').forEach((button) => {
+            button.addEventListener('click', () => {
+                receiveForm.action = button.dataset.receiveUrl;
+                receiveMessage.textContent = `Deseja confirmar o recebimento de ${button.dataset.receiveName}?`;
+                receiveModal.classList.add('open');
+            });
+        });
+
+        document.querySelectorAll('[data-close-modal]').forEach((button) => {
+            button.addEventListener('click', () => {
+                deleteModal.classList.remove('open');
+                receiveModal.classList.remove('open');
+            });
+        });
+    </script>
+</body>
+</html>

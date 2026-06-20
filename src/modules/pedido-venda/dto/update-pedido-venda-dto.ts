@@ -19,4 +19,8 @@ export class UpdatePedidoVendaDto {
     @ArrayNotEmpty({ message: 'Informe ao menos um produto.' })
     @IsInt({ each: true, message: 'Cada produto deve ser identificado por um numero inteiro.' })
     produtoIds?: number[];
+
+    @IsOptional()
+    @IsArray({ message: 'Os itens devem ser informados em uma lista.' })
+    itens?: Array<{ produtoId: number; quantidade: number; valorUnitario: number; total: number }>;
 }

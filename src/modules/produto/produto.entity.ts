@@ -7,7 +7,7 @@ export class Produto extends BaseEntity {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column()
+    @Column({ unique: true })
     codigo!: string;
 
     @Column()

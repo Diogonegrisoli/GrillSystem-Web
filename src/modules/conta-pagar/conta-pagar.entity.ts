@@ -43,10 +43,10 @@ export class ContaPagar extends BaseEntity {
     })
     status!: StatusContaPagar;
 
-    @Column()
-    pedidoCompraId!: number;
+    @Column({ nullable: true, unique: true })
+    pedidoCompraId!: number | null;
 
-    @OneToOne(() => PedidoCompra, (pedidoCompra) => pedidoCompra.contaPagar)
+    @OneToOne(() => PedidoCompra, (pedidoCompra) => pedidoCompra.contaPagar, { nullable: true })
     @JoinColumn()
-    pedidoCompra!: PedidoCompra;
+    pedidoCompra?: PedidoCompra;
 }
